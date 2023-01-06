@@ -11,5 +11,3 @@ $locator = new Locator();
 $locator = $locator->locate(new Ip('8.8.8.8'));
 
 $country = $locator ? $locator->getCountry() : '';
-
-print_r($country);
