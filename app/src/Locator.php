@@ -6,6 +6,14 @@ namespace App\src;
 
 class Locator
 {
+    public function __construct(
+        private HttpClient $client,
+        // private string $apiKey)
+    ) {
+        $this->client = $client;
+        // $this->apiKey = $apiKey;//Это для платных api
+    }
+
     public function locate(Ip $ip): ?Location
     {
         $url = 'https://api.iplocation.net/?'.http_build_query([
@@ -14,18 +22,15 @@ class Locator
 
         // $response = file_get_contents($url);
         // curl
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        $response = curl_exec($ch);
-
-        curl_close($ch);
+        $response = $this->client->get($url);
 
         $data = json_decode($response, true);
 
-        $data = array_map(function ($value) {
-            return '-' !== $value ? $value : null;
-        }, $data);
+        $data = array_map(
+            fn ($value) => '-' !== $value ? $value : null,
+            $data
+        );
 
         if (empty($data['country_name'])) {
             return null;
